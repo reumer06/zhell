@@ -1,5 +1,7 @@
 const std = @import("std");
 
-pub fn main() void {
-    std.debug.print("Hello {s}!\n",.{"World"});
+pub fn main() !void {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){}; // allocator object
+    defer _ = gpa.deinit(); // free memory
+    // const allocator = gpa.allocator();
 }
