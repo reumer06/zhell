@@ -1,5 +1,19 @@
 const std = @import("std");
 
+fn listDir(stdout : *std.io.Writer) !void {     
+    var dir = 
+    try std.fs.cwd().openDir(".",.{.iterate = true});
+    defer dir.close();
+    var it = dir.iterate();
+    while(try it.next()) |entry| {
+        switch (entry.kind) { 
+            .directory  => 
+            try stdout.print("{s}/\n",.{entry.name}),
+            else => try stdout.print("{s}\n",.{entry.name})
+        }
+    }
+}
+
 pub fn main() !void {
     const stdout_file = std.fs.File.stdout();
     _ = stdout_file.getOrEnableAnsiEscapeSupport();
@@ -23,6 +37,12 @@ pub fn main() !void {
             try stdout.writeAll("bye!\n");
             try stdout.flush();
             break;
+        }
+
+        if(std.mem.eql(u8,line,"ls")){
+            try listDir(stdout);
+            try stdout.flush();
+            continue;
         }
 
         if (std.mem.eql(u8, line, "cls") or std.mem.eql(u8, line, "clear")) {
