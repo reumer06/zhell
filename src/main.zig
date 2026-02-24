@@ -15,6 +15,12 @@ fn listDir(stdout : *std.io.Writer) !void {
 }
 
 pub fn main() !void {
+
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+
+    const allocator = gpa.allocator();
+
     const stdout_file = std.fs.File.stdout();
     _ = stdout_file.getOrEnableAnsiEscapeSupport();
 
@@ -39,7 +45,7 @@ pub fn main() !void {
             break;
         }
 
-        if(std.mem.eql(u8,line,"ls")){
+        if (std.mem.eql(u8,line,"ls")){
             try listDir(stdout);
             try stdout.flush();
             continue;
@@ -51,7 +57,16 @@ pub fn main() !void {
             continue;
         }
 
-        try stdout.print("{s}\n", .{line});
-        try stdout.flush();
+        if (line.len == 0) continue;
+
+        var child = std.process.Child.init(&[_][]const u8{line},allocator);
+        child.spawn() catch |err|{
+        if(err == error.FileNotFound) {
+            try stdout.print("'{s}' is not recognized as an internal or external command,\noperable program or batch file.\n", .{line});
+            }
+            try stdout.flush();
+            continue;
+        };
+        _ = try child.wait();
     }
 }
