@@ -1,4 +1,6 @@
 .zig-cache
 zig-out
 /src/ref.c
+src/main.exe
+src/main.pdb
 .idea
