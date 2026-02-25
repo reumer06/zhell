@@ -45,7 +45,7 @@ pub fn main() !void {
             break;
         }
 
-        if (std.mem.eql(u8,line,"ls")){
+        if (std.mem.eql(u8,line,"ls")) {
             try listDir(stdout);
             try stdout.flush();
             continue;
@@ -53,6 +53,16 @@ pub fn main() !void {
 
         if (std.mem.eql(u8, line, "cls") or std.mem.eql(u8, line, "clear")) {
             try stdout.writeAll("\x1b[2J\x1b[H"); // ANSI escape sequence
+            try stdout.flush();
+            continue;
+        }
+
+        if (std.mem.eql(u8,line,"pwd")) {
+            
+            const cwd = try std.process.getCwdAlloc(allocator);
+            defer allocator.free(cwd);
+
+            try stdout.print("{s}\n",.{cwd});
             try stdout.flush();
             continue;
         }
