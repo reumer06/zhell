@@ -75,8 +75,14 @@ pub fn main() !void {
                         text = text[1..text.len - 1];
                 }
             }
+
+            var iter = std.mem.splitScalar(u8,text,' ');
+            while (iter.next()) |word| {
+                if(word.len > 0) {
+                    try stdout.print("{s}\n",.{word});
+                }
+            }
             
-            try stdout.print("{s}\n",.{text});
             try stdout.flush();
             continue;
         }
