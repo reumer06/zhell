@@ -58,11 +58,25 @@ pub fn main() !void {
         }
 
         if (std.mem.eql(u8,line,"pwd")) {
-            
             const cwd = try std.process.getCwdAlloc(allocator);
             defer allocator.free(cwd);
 
             try stdout.print("{s}\n",.{cwd});
+            try stdout.flush();
+            continue;
+        }
+
+        if (std.mem.startsWith(u8,line, "echo")) {
+            var text = line[5..];
+
+            if (text.len >= 2) {
+                if ((text[0] == '"' and text[text.len - 1] == '"') or 
+                    (text[0] == '\'' and text[text.len - 1] == '\'')) {
+                        text = text[1..text.len - 1];
+                }
+            }
+            
+            try stdout.print("{s}\n",.{text});
             try stdout.flush();
             continue;
         }
