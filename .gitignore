@@ -4,3 +4,4 @@ zig-out
 src/main.exe
 src/main.pdb
 .idea
+.txt
