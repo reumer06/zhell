@@ -33,6 +33,7 @@ pub fn main() !void {
     const stdin: *std.io.Reader = &stdin_reader.interface;
 
     while (true) {
+        
         try stdout.writeAll("> ");
         try stdout.flush();
 
@@ -83,6 +84,14 @@ pub fn main() !void {
                 }
             }
             
+            try stdout.flush();
+            continue;
+        }
+
+        if (std.mem.eql(u8,line,"help")) {
+            var child = std.process.Child.init(&[_][]const u8{"help"}, allocator);
+            _ = try child.spawnAndWait();
+
             try stdout.flush();
             continue;
         }
