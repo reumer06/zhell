@@ -87,13 +87,27 @@ pub fn main() !void {
             continue;
         }
 
+        if (std.mem.eql(u8, line, "?")) {
+            const file = try std.fs.cwd().openFile("help.txt", .{});
+            defer file.close();
+
+            const content = try file.readToEndAlloc(allocator, 4096);
+            defer allocator.free(content);
+            
+            try stdout.writeAll(content);
+            try stdout.flush();
+            continue;
+        }
+
         if (line.len == 0) continue;
 
         var child = std.process.Child.init(&[_][]const u8{line},allocator);
         child.spawn() catch |err|{
+        
         if(err == error.FileNotFound) {
             try stdout.print("'{s}' is not recognized as an internal or external command,\noperable program or batch file.\n", .{line});
             }
+
             try stdout.flush();
             continue;
         };
