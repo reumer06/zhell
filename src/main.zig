@@ -33,8 +33,11 @@ pub fn main() !void {
     const stdin: *std.io.Reader = &stdin_reader.interface;
 
     while (true) {
-        
-        try stdout.writeAll("> ");
+
+        const dir = try std.process.getCwdAlloc(allocator);
+        defer allocator.free(dir);
+
+        try stdout.print("{s}> ",.{dir});
         try stdout.flush();
 
         const bare_line = try stdin.takeDelimiter('\n') orelse break;
