@@ -70,6 +70,14 @@ pub fn main() !void {
             continue;
         }
 
+        if (std.mem.startsWith(u8, line, "cd")) {
+            if (line.len == 2) {
+                try stdout.writeAll("Usage: cd <directory>\n");
+                try stdout.flush();
+                continue;
+            }
+        }
+
         if (std.mem.startsWith(u8,line, "echo")) {
             var text = line[5..];
 
