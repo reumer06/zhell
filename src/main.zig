@@ -1,21 +1,19 @@
 const std = @import("std");
 
-fn listDir(stdout : *std.io.Writer) !void {     
-    var dir = 
-    try std.fs.cwd().openDir(".",.{.iterate = true});
+fn listDir(stdout: *std.io.Writer) !void {
+    var dir =
+        try std.fs.cwd().openDir(".", .{ .iterate = true });
     defer dir.close();
     var it = dir.iterate();
-    while(try it.next()) |entry| {
-        switch (entry.kind) { 
-            .directory  => 
-            try stdout.print("{s}/\n",.{entry.name}),
-            else => try stdout.print("{s}\n",.{entry.name})
+    while (try it.next()) |entry| {
+        switch (entry.kind) {
+            .directory => try stdout.print("{s}/\n", .{entry.name}),
+            else => try stdout.print("{s}\n", .{entry.name}),
         }
     }
 }
 
 pub fn main() !void {
-
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
 
@@ -33,11 +31,10 @@ pub fn main() !void {
     const stdin: *std.io.Reader = &stdin_reader.interface;
 
     while (true) {
-
         const dir = try std.process.getCwdAlloc(allocator);
         defer allocator.free(dir);
 
-        try stdout.print("{s}> ",.{dir});
+        try stdout.print("{s}> ", .{dir});
         try stdout.flush();
 
         const bare_line = try stdin.takeDelimiter('\n') orelse break;
@@ -49,7 +46,7 @@ pub fn main() !void {
             break;
         }
 
-        if (std.mem.eql(u8,line,"ls")) {
+        if (std.mem.eql(u8, line, "ls")) {
             try listDir(stdout);
             try stdout.flush();
             continue;
@@ -61,11 +58,11 @@ pub fn main() !void {
             continue;
         }
 
-        if (std.mem.eql(u8,line,"pwd")) {
+        if (std.mem.eql(u8, line, "pwd")) {
             const cwd = try std.process.getCwdAlloc(allocator);
             defer allocator.free(cwd);
 
-            try stdout.print("{s}\n",.{cwd});
+            try stdout.print("{s}\n", .{cwd});
             try stdout.flush();
             continue;
         }
@@ -76,30 +73,57 @@ pub fn main() !void {
                 try stdout.flush();
                 continue;
             }
-        }
 
-        if (std.mem.startsWith(u8,line, "echo")) {
-            var text = line[5..];
-
-            if (text.len >= 2) {
-                if ((text[0] == '"' and text[text.len - 1] == '"') or 
-                    (text[0] == '\'' and text[text.len - 1] == '\'')) {
-                        text = text[1..text.len - 1];
+            var targetdir = std.mem.trim(u8, line[3..], " ");
+            if (targetdir.len >= 2) {
+                if ((targetdir[0] == '"' and targetdir[targetdir.len - 1] == '"') or
+                    (targetdir[0] == '\'' and targetdir[targetdir.len - 1] == '\''))
+                {
+                    targetdir = targetdir[1 .. targetdir.len - 1];
                 }
             }
 
-            var iter = std.mem.splitScalar(u8,text,' ');
-            while (iter.next()) |word| {
-                if(word.len > 0) {
-                    try stdout.print("{s}\n",.{word});
-                }
-            }
-            
+            var target_d = std.fs.cwd().openDir(targetdir, .{}) catch |err| {
+                try stdout.print("cd: cannot access '{s}': {}\n", .{ targetdir, err });
+                try stdout.flush();
+                continue;
+            };
+
+            defer target_d.close();
+
+            target_d.setAsCwd() catch |err| {
+                try stdout.print("cd: failed to change directory: {}\n", .{err});
+                try stdout.flush();
+                continue;
+            };
+
             try stdout.flush();
             continue;
         }
 
-        if (std.mem.eql(u8,line,"help")) {
+        if (std.mem.startsWith(u8, line, "echo")) {
+            var text = line[5..];
+
+            if (text.len >= 2) {
+                if ((text[0] == '"' and text[text.len - 1] == '"') or
+                    (text[0] == '\'' and text[text.len - 1] == '\''))
+                {
+                    text = text[1 .. text.len - 1];
+                }
+            }
+
+            var iter = std.mem.splitScalar(u8, text, ' ');
+            while (iter.next()) |word| {
+                if (word.len > 0) {
+                    try stdout.print("{s}\n", .{word});
+                }
+            }
+
+            try stdout.flush();
+            continue;
+        }
+
+        if (std.mem.eql(u8, line, "help")) {
             var child = std.process.Child.init(&[_][]const u8{"help"}, allocator);
             _ = try child.spawnAndWait();
 
@@ -113,7 +137,7 @@ pub fn main() !void {
 
             const content = try file.readToEndAlloc(allocator, 4096);
             defer allocator.free(content);
-            
+
             try stdout.writeAll(content);
             try stdout.flush();
             continue;
@@ -121,11 +145,10 @@ pub fn main() !void {
 
         if (line.len == 0) continue;
 
-        var child = std.process.Child.init(&[_][]const u8{line},allocator);
-        child.spawn() catch |err|{
-        
-        if(err == error.FileNotFound) {
-            try stdout.print("'{s}' is not recognized as an internal or external command,\noperable program or batch file.\n", .{line});
+        var child = std.process.Child.init(&[_][]const u8{line}, allocator);
+        child.spawn() catch |err| {
+            if (err == error.FileNotFound) {
+                try stdout.print("'{s}' is not recognized as an internal or external command,\noperable program or batch file.\n", .{line});
             }
 
             try stdout.flush();
