@@ -13,6 +13,40 @@ fn listDir(stdout: *std.io.Writer) !void {
     }
 }
 
+fn changeDir(line: []const u8, stdout: *std.io.Writer, allocator: std.mem.Allocator) !void {
+    _ = allocator;
+
+    if (line.len == 2) {
+        try stdout.writeAll("Usage: cd <directory>\n");
+        try stdout.flush();
+    }
+
+    var targetdir = std.mem.trim(u8, line[3..], " ");
+    if (targetdir.len >= 2) {
+        if ((targetdir[0] == '"' and targetdir[targetdir.len - 1] == '"') or
+            (targetdir[0] == '\'' and targetdir[targetdir.len - 1] == '\''))
+        {
+            targetdir = targetdir[1 .. targetdir.len - 1];
+        }
+    }
+
+    var target_d = std.fs.cwd().openDir(targetdir, .{}) catch |err| {
+        try stdout.print("cd: cannot access '{s}': {}\n", .{ targetdir, err });
+        try stdout.flush();
+        return;
+    };
+
+    defer target_d.close();
+
+    target_d.setAsCwd() catch |err| {
+        try stdout.print("cd: failed to change directory: {}\n", .{err});
+        try stdout.flush();
+        return;
+    };
+
+    try stdout.flush();
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -68,36 +102,7 @@ pub fn main() !void {
         }
 
         if (std.mem.startsWith(u8, line, "cd")) {
-            if (line.len == 2) {
-                try stdout.writeAll("Usage: cd <directory>\n");
-                try stdout.flush();
-                continue;
-            }
-
-            var targetdir = std.mem.trim(u8, line[3..], " ");
-            if (targetdir.len >= 2) {
-                if ((targetdir[0] == '"' and targetdir[targetdir.len - 1] == '"') or
-                    (targetdir[0] == '\'' and targetdir[targetdir.len - 1] == '\''))
-                {
-                    targetdir = targetdir[1 .. targetdir.len - 1];
-                }
-            }
-
-            var target_d = std.fs.cwd().openDir(targetdir, .{}) catch |err| {
-                try stdout.print("cd: cannot access '{s}': {}\n", .{ targetdir, err });
-                try stdout.flush();
-                continue;
-            };
-
-            defer target_d.close();
-
-            target_d.setAsCwd() catch |err| {
-                try stdout.print("cd: failed to change directory: {}\n", .{err});
-                try stdout.flush();
-                continue;
-            };
-
-            try stdout.flush();
+            try changeDir(line, stdout, allocator);
             continue;
         }
 
