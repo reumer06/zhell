@@ -66,6 +66,17 @@ fn removeFile(line: []const u8, stdout: *std.io.Writer, allocator: std.mem.Alloc
             path = path[1 .. path.len - 1];
         }
     }
+
+    std.fs.cwd().deleteFile(path) catch {
+        std.fs.cwd().deleteDir(path) catch {
+            std.fs.cwd().deleteTree(path) catch |errTree| {
+                try stdout.print("rm: cannot remove '{s}': {}\n", .{ path, errTree });
+                try stdout.flush();
+                return;
+            };
+        };
+    };
+    try stdout.flush();
 }
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -123,6 +134,11 @@ pub fn main() !void {
 
         if (std.mem.startsWith(u8, line, "cd")) {
             try changeDir(line, stdout, allocator);
+            continue;
+        }
+         
+        if(std.mem.eql(u8, line, "rm")) {
+            try removeFile(line, stdout, allocator);
             continue;
         }
 
