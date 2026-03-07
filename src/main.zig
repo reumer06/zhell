@@ -47,6 +47,17 @@ fn changeDir(line: []const u8, stdout: *std.io.Writer, allocator: std.mem.Alloca
     try stdout.flush();
 }
 
+fn removeFile(line: []const u8, stdout: *std.io.Writer, allocator: std.mem.Allocator) !void {
+    _ = allocator;
+
+    const target = std.mem.trim(u8, line[3..], " ");
+
+    if (target.len == 0) {
+        try stdout.writeAll("Usage: rm<file|directory>\n");
+        try stdout.flush();
+        return;
+    }
+}
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
