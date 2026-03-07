@@ -57,6 +57,15 @@ fn removeFile(line: []const u8, stdout: *std.io.Writer, allocator: std.mem.Alloc
         try stdout.flush();
         return;
     }
+
+    var path = target;
+    if (path.len >= 2) {
+        if ((path[0] == '"' and path[path.len - 1] == '"') or
+            (path[0] == '\'' and path[path.len - 1] == '\''))
+        {
+            path = path[1 .. path.len - 1];
+        }
+    }
 }
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
