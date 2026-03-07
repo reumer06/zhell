@@ -137,7 +137,7 @@ pub fn main() !void {
             continue;
         }
          
-        if(std.mem.eql(u8, line, "rm")) {
+        if(std.mem.startsWith(u8, line, "rm")) {
             try removeFile(line, stdout, allocator);
             continue;
         }
