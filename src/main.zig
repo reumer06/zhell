@@ -78,6 +78,25 @@ fn removeFile(line: []const u8, stdout: *std.io.Writer, allocator: std.mem.Alloc
     };
     try stdout.flush();
 }
+
+fn runScripts(stdout: *std.io.Writer, allocator: std.mem.Allocator) !void {
+    var child = std.process.Child.init(&[_][]const u8{
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts.ps1",
+    }, allocator);
+
+    _ = child.spawnAndWait() catch |err| {
+        try stdout.print("failed to run scripts; {}\n", .{err});
+        try stdout.flush();
+        return;
+    };
+
+    try stdout.flush();
+}
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -136,8 +155,8 @@ pub fn main() !void {
             try changeDir(line, stdout, allocator);
             continue;
         }
-         
-        if(std.mem.startsWith(u8, line, "rm")) {
+
+        if (std.mem.startsWith(u8, line, "rm")) {
             try removeFile(line, stdout, allocator);
             continue;
         }
