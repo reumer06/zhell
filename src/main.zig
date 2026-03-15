@@ -203,6 +203,11 @@ pub fn main() !void {
             continue;
         }
 
+        if (std.mem.eql(u8, line, "reshell")) {
+            try runScripts(stdout, allocator);
+            continue;
+        }
+
         if (line.len == 0) continue;
 
         var child = std.process.Child.init(&[_][]const u8{line}, allocator);
