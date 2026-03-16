@@ -203,7 +203,7 @@ pub fn main() !void {
             continue;
         }
 
-        if (std.mem.eql(u8, line, "reshell")) {
+        if (std.mem.eql(u8, line, "zhell")) {
             try runScripts(stdout, allocator);
             continue;
         }

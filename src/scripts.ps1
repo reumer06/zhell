@@ -1,4 +1,4 @@
-Write-Host "Intializing reShell..."
+Write-Host "Intializing zhell..."
 
 $scoopCmd = Get-Command scoop -ErrorAction SilentlyContinue
 
