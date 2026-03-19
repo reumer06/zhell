@@ -199,6 +199,7 @@ pub fn main() !void {
             defer allocator.free(content);
 
             try stdout.writeAll(content);
+            try stdout.writeAll("\n");
             try stdout.flush();
             continue;
         }
