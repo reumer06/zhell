@@ -9,3 +9,15 @@ if ($null -eq $scoopCmd) {
 else {
     Write-Host "Found Scoop."
 }
+
+function EnsureScoopBucket {
+    param([string]$Name) 
+    $bucketExists = scoop bucket list  | Select-String -SimpleMatch $Name
+    if (-not $bucketExists) {
+        Write-Host "Adding bucket: $Name"
+        scoop bucket add $Name
+    }
+    else {
+        Write-Host "Bucket already exits: $Name"
+    }
+}
