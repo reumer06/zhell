@@ -24,7 +24,7 @@ function EnsureScoopBucket {
 
 function EnsureTool {
     param([string]$Name)
-    $toolExits = scoop list | Select-String -SimpleMatch $Name
+    $toolExists = Test-Path "$env:USERPROFILE\scoop\apps\$Name"
     if (-not $toolExits) {
         Write-Host "Installing tool: $Name"
         scoop install $Name
