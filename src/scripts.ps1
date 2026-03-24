@@ -16,13 +16,13 @@ function Ensure-ScoopBucket {
     if (-not $bucketpath) {
         Write-Host "Adding bucket: $Name"
         if ($null -eq (Get-Command git -ErrorAction SilentlyContinue)) {
-            Write-Host "git not found. Installing git..."
+            Write-Host "  -> git required. Installing git..."
             scoop install git
         }
         scoop bucket add $Name
     }
     else {
-        Write-Host "Bucket already exits: $Name"
+        Write-Host "Bucket already exists: $Name"
     }
 }
 
@@ -34,7 +34,7 @@ function Ensure-Apps {
         scoop install $Name
     }
     else {
-        Write-Host "Tool exits: $Name"
+        Write-Host "Tool exists: $Name"
     }
 }
 
