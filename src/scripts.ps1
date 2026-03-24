@@ -1,16 +1,16 @@
-Write-Host "Initializing zhell..."
+function Ensure-Scoop {
+    $scoopCmd = Get-Command scoop -ErrorAction SilentlyContinue
 
-$scoopCmd = Get-Command scoop -ErrorAction SilentlyContinue
-
-if ($null -eq $scoopCmd) {
-    Write-Host "Scoop not found. Installing Scoop..."
-    irm get.scoop.sh | iex
+    if ($null -eq $scoopCmd) {
+        Write-Host "Scoop not found. Installing Scoop..."
+        irm get.scoop.sh | iex
+    }
+    else {
+        Write-Host "Found Scoop."
+    }
 }
-else {
-    Write-Host "Found Scoop."
-}
 
-function EnsureScoopBucket {
+function Ensure-ScoopBucket {
     param([string]$Name) 
     $bucketExists = scoop bucket list  | Select-String -SimpleMatch $Name
     if (-not $bucketExists) {
@@ -22,13 +22,18 @@ function EnsureScoopBucket {
     }
 }
 
-function EnsureTool {
+function Ensure-Tool {
     param([string]$Name)
     $toolExists = Test-Path "$env:USERPROFILE\scoop\apps\$Name"
     if (-not $toolExits) {
         Write-Host "Installing tool: $Name"
         scoop install $Name
-    } else {
+    }
+    else {
         Write-Host "Tool exits: $Name"
     }
 }
+
+Write-Host "Initializing zhell..."
+
+Ensure-Scoop
