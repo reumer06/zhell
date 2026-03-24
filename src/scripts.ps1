@@ -41,4 +41,7 @@ function Ensure-Apps {
 Write-Host "Initializing zhell..."
 Ensure-Scoop
 
+Ensure-ScoopBucket "versions"
+Ensure-ScoopBucket "extras"
+
 Ensure-Apps "yazi"
