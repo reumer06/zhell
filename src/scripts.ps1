@@ -21,3 +21,14 @@ function EnsureScoopBucket {
         Write-Host "Bucket already exits: $Name"
     }
 }
+
+function EnsureTool {
+    param([string]$Name)
+    $toolExits = scoop list | Select-String -SimpleMatch $Name
+    if (-not $toolExits) {
+        Write-Host "Installing tool: $Name"
+        scoop install $Name
+    } else {
+        Write-Host "Tool exits: $Name"
+    }
+}
