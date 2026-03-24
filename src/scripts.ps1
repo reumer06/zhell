@@ -15,6 +15,10 @@ function Ensure-ScoopBucket {
     $bucketpath = scoop bucket list  | Select-String -SimpleMatch $Name
     if (-not $bucketpath) {
         Write-Host "Adding bucket: $Name"
+        if ($null -eq (Get-Command git -ErrorAction SilentlyContinue)) {
+            Write-Host "git not found. Installing git..."
+            scoop install git
+        }
         scoop bucket add $Name
     }
     else {
