@@ -16,7 +16,8 @@ function Ensure-ScoopBucket {
     if (-not $bucketpath) {
         Write-Host "Adding bucket: $Name" -ForegroundColor Cyan
         if ($null -eq (Get-Command git -ErrorAction SilentlyContinue)) {
-            Write-Host "  -> git required. Installing git..." -ForegroundColor Red
+            Write-Host "  -> git required." -ForegroundColor Red
+            Write-Host "Installing git..." -ForegroundColor cyan
             scoop install git
         }
         scoop bucket add $Name
