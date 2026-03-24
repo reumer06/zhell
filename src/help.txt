@@ -1,1 +1,2 @@
 ZHELL       Initializes Zhell
+YAZI        File Manager
