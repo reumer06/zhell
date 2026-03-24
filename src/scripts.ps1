@@ -12,8 +12,8 @@ function Ensure-Scoop {
 
 function Ensure-ScoopBucket {
     param([string]$Name) 
-    $bucketExists = scoop bucket list  | Select-String -SimpleMatch $Name
-    if (-not $bucketExists) {
+    $bucketpath = scoop bucket list  | Select-String -SimpleMatch $Name
+    if (-not $bucketpath) {
         Write-Host "Adding bucket: $Name"
         scoop bucket add $Name
     }
@@ -22,10 +22,10 @@ function Ensure-ScoopBucket {
     }
 }
 
-function Ensure-Tool {
+function Ensure-Apps {
     param([string]$Name)
-    $toolExists = Test-Path "$env:USERPROFILE\scoop\apps\$Name"
-    if (-not $toolExits) {
+    $appsPath = Test-Path "$env:USERPROFILE\scoop\apps\$Name"
+    if (-not $appsPath) {
         Write-Host "Installing tool: $Name"
         scoop install $Name
     }
@@ -35,5 +35,6 @@ function Ensure-Tool {
 }
 
 Write-Host "Initializing zhell..."
-
 Ensure-Scoop
+
+Ensure-Apps "yazi"
