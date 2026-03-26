@@ -214,7 +214,10 @@ pub fn main() !void {
         var child = std.process.Child.init(&[_][]const u8{line}, allocator);
         child.spawn() catch |err| {
             if (err == error.FileNotFound) {
-                try stdout.print("'{s}' is not recognized as an internal or external command,\noperable program or batch file.\n", .{line});
+                const red = "\x1b[91m"; // ANSI color code for red
+                const reset = "\x1b[0m";
+
+                try stdout.print("{s}'{s}' is not recognized as an internal or external command,\noperable program or batch file.\n{s}", .{ red, line, reset });
             }
 
             try stdout.flush();
