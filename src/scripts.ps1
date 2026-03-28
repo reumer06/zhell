@@ -1,7 +1,5 @@
 function Ensure-Scoop {
-    $scoopCmd = Get-Command scoop -ErrorAction SilentlyContinue
-
-    if ($null -eq $scoopCmd) {
+    if ($null -eq (Get-Command scoop -ErrorAction SilentlyContinue)) {
         Write-Host "Scoop not found. Installing..." -ForegroundColor Cyan
         irm get.scoop.sh | iex
     }
@@ -12,8 +10,7 @@ function Ensure-Scoop {
 
 function Ensure-ScoopBucket {
     param([string]$Name) 
-    $bucketpath = scoop bucket list  | Select-String -SimpleMatch $Name
-    if (-not $bucketpath) {
+    if (-not (scoop bucket list  | Select-String -SimpleMatch $Name)) {
         Write-Host "Adding bucket: $Name" -ForegroundColor Cyan
         if ($null -eq (Get-Command git -ErrorAction SilentlyContinue)) {
             Write-Host "  -> git required." -ForegroundColor Red
@@ -29,8 +26,7 @@ function Ensure-ScoopBucket {
 
 function Ensure-Apps {
     param([string]$Name)
-    $appsPath = Test-Path "$env:USERPROFILE\scoop\apps\$Name"
-    if (-not $appsPath) {
+    if (-not (Test-Path "$env:USERPROFILE\scoop\apps\$Name")) {
         Write-Host "Installing tool: $Name"  -ForegroundColor Cyan
         scoop install $Name
     }
