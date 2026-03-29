@@ -43,3 +43,4 @@ Ensure-ScoopBucket "extras"
 
 Ensure-Apps "yazi"
 Ensure-Apps "fzf"
+Ensure-Apps "atuin"
