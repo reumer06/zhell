@@ -41,6 +41,6 @@ Ensure-Scoop
 Ensure-ScoopBucket "versions"
 Ensure-ScoopBucket "extras"
 
-Ensure-Apps "yazi"
-Ensure-Apps "fzf"
-Ensure-Apps "atuin"
+Ensure-Apps "yazi"      # https://github.com/sxyazi/yazi
+Ensure-Apps "fzf"       # https://github.com/junegunn/fzf
+Ensure-Apps "atuin"     # https://github.com/atuinsh/atuin
