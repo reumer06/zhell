@@ -42,3 +42,4 @@ Ensure-ScoopBucket "versions"
 Ensure-ScoopBucket "extras"
 
 Ensure-Apps "yazi"
+Ensure-Apps "fzf"
